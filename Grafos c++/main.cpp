@@ -49,7 +49,7 @@ void menu() {
     cout << "1. Agregar Grafo\n";
     cout << "2. Seleccionar Grafo\n";
     cout << "3. Borrar Grafo\n";
-    cout << "\nOpción seleccionada: ";
+    cout << "\nOpciï¿½n seleccionada: ";
     cin >> option;
 
     switch (option)
@@ -61,7 +61,7 @@ void menu() {
     case 3: cout << "Borrando grafo"; // Cambiar la opcion al menu correspondiente
         break;
     default:
-        cout << "Opción no válida";
+        cout << "Opciï¿½n no vï¿½lida";
         break;
     }
 }
@@ -127,7 +127,7 @@ void agregarGrafo() {
         cout << "1. Grafo dirigido\n";
         cout << "2. Grafo no dirigido\n";
 
-        cout << "\nOpción seleccionada: ";
+        cout << "\nOpciï¿½n seleccionada: ";
         cin >> option;
 
 
@@ -466,3 +466,6 @@ void peso() {
             aux = aux->siguiente;
     }
 }
+
+
+//! Hola este es el segundo commit
