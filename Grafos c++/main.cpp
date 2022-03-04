@@ -1,5 +1,9 @@
-#include<iostream>
-#include<locale.h>
+#include <iostream>
+#include <locale.h>
+#include <list>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
@@ -10,8 +14,7 @@ struct Nodo {
 };
 
 struct Arista {
-    struct Nodo* derecha;
-    struct Nodo* izquierda;
+    struct Nodo* destino;
     struct Arista* siguiente;
 };
 
@@ -20,9 +23,9 @@ typedef struct Arista* TArista;
 
 bool dirigido = false;
 void menu();
-void menuGrafo();
-void agregarGrafo();
-void insertarNodo();
+void menu_grafo();
+void agregar_grafo();
+void insertar_nodo(string);
 void agrega_arista(TNode&, TNode&, TArista&);
 void insertar_arista();
 void vaciar_aristas(TNode&);
@@ -31,15 +34,18 @@ void eliminar_arista();
 void mostrar_grafo();
 void mostrar_aristas();
 void peso();
+void verificar_convexo();
+void abrir_archivo();
 
 TNode p;
+list<string> nombres;
 
 int main() {
     system("color 0b");
     setlocale(LC_ALL, "");
 
-    agregarGrafo();
-    menuGrafo();
+    agregar_grafo();
+    menu_grafo();
     system("pause");
 }
 
@@ -49,76 +55,24 @@ void menu() {
     cout << "1. Agregar Grafo\n";
     cout << "2. Seleccionar Grafo\n";
     cout << "3. Borrar Grafo\n";
-    cout << "\nOpci�n seleccionada: ";
+    cout << "\nOpción seleccionada: ";
     cin >> option;
 
     switch (option)
     {
-    case 1: agregarGrafo();
+    case 1: agregar_grafo();
         break;
-    case 2: menuGrafo();
+    case 2: menu_grafo();
         break;
     case 3: cout << "Borrando grafo"; // Cambiar la opcion al menu correspondiente
         break;
     default:
-        cout << "Opci�n no v�lida";
+        cout << "Opción no válida";
         break;
     }
 }
 
-void menuGrafo() {
-    system("cls");
-    int op = 0;
-    do
-    {
-        cout << "\tREPRESENTACION DE GRAFOS DIRIGIDOS\n\n";
-        cout << " 1. INSERTAR UN NODO                 " << endl;
-        cout << " 2. INSERTAR UNA ARISTA              " << endl;
-        cout << " 3. ELIMINAR UN NODO                 " << endl;
-        cout << " 4. ELIMINAR UNA ARISTA              " << endl;
-        cout << " 5. MOSTRAR  GRAFO                   " << endl;
-        cout << " 6. MOSTRAR ARISTAS DE UN NODO       " << endl;
-        cout << " 7. MOSTRAR PESO DE UN NODO          " << endl;
-        cout << " 8. SALIR                            " << endl;
-
-        cout << "\n INGRESE OPCION: ";
-
-        cin >> op;
-
-        switch (op)
-        {
-        case 1:
-            insertarNodo();
-            break;
-        case 2: insertar_arista();
-            break;
-        case 3: eliminar_nodo();
-            break;
-        case 4: eliminar_arista();
-            break;
-        case 5: mostrar_grafo();
-            break;
-        case 6: mostrar_aristas();
-            break;
-        case 7: peso();
-            break;
-
-        case 8: continue; 
-
-        default: cout << "OPCION NO VALIDA...!!!";
-            break;
-
-
-        }
-
-        cout << endl << endl;
-        system("pause");  system("cls");
-
-    } while (op != 8);
-    system("cls");
-}
-
-void agregarGrafo() {
+void agregar_grafo() {
     int option = 0;
     do {
         system("cls");
@@ -126,6 +80,7 @@ void agregarGrafo() {
 
         cout << "1. Grafo dirigido\n";
         cout << "2. Grafo no dirigido\n";
+        cout << "3. Abrir grafo por archivo\n";
 
         cout << "\nOpci�n seleccionada: ";
         cin >> option;
@@ -139,21 +94,89 @@ void agregarGrafo() {
         case 2:
             dirigido = false;
             break;
+        case 3:
+            abrir_archivo();
+            break;
         default:
             cout << "Opcion no valida!\n";
             system("pause");
             break;
         }
-    } while (option > 2 || option < 1);
+    } while (option > 3 || option < 1);
 }
+
+
+#pragma region Dirigidos
+
+void menu_grafo() {
+    system("cls");
+    int op = 0;
+    do
+    {
+        if(dirigido)
+            cout << "\tREPRESENTACION DE GRAFOS DIRIGIDOS\n\n";
+        else
+            cout << "\tREPRESENTACION DE GRAFOS NO DIRIGIDOS\n\n";
+
+        cout << " 1. INSERTAR UN NODO                 " << endl;
+        cout << " 2. INSERTAR UNA ARISTA              " << endl;
+        cout << " 3. ELIMINAR UN NODO                 " << endl;
+        cout << " 4. ELIMINAR UNA ARISTA              " << endl;
+        cout << " 5. MOSTRAR  GRAFO                   " << endl;
+        cout << " 6. MOSTRAR ARISTAS DE UN NODO       " << endl;
+        cout << " 7. MOSTRAR PESO DE UN NODO          " << endl;
+        cout << " 8. VERIFICAR CONVEXIDAD             " << endl;
+        cout << " 9. SALIR                            " << endl;
+
+        cout << "\n INGRESE OPCION: ";
+
+        cin >> op;
+
+        string _nombre;
+        switch (op){
+        case 1:
+            cout << "INGRESE VARIABLE:";
+            cin >> _nombre;
+            insertar_nodo(_nombre);
+            break;
+        case 2: insertar_arista();
+            break;
+        case 3: eliminar_nodo();
+            break;
+        case 4: eliminar_arista();
+            break;
+        case 5: mostrar_grafo();
+            break;
+        case 6: mostrar_aristas();
+            break;
+        case 7: peso();
+            break;
+        case 8: verificar_convexo();
+            break;
+        case 9: continue;
+
+        default: cout << "OPCION NO VALIDA...!!!";
+                op = 0;
+            break;
+
+
+        }
+
+        cout << endl << endl;
+        system("pause");  system("cls");
+
+    } while (op != 9);
+    system("cls");
+}
+
+#pragma endregion
 
 /*                      INSERTAR NODO AL GRAFO
 ---------------------------------------------------------------------*/
-void insertarNodo()
+void insertar_nodo(string _nombre)
 {
     TNode t, nuevo = new struct Nodo;
-    cout << "INGRESE VARIABLE:";
-    cin >> nuevo->nombre;
+    nuevo->nombre = _nombre;
     nuevo->siguiente = NULL;
     nuevo->adyacente = NULL;
 
@@ -173,6 +196,7 @@ void insertarNodo()
         cout << "NODO INGRESADO.\n";
     }
 
+    nombres.push_back(nuevo->nombre);
 }
 
 /*                      AGREGAR ARISTA
@@ -181,23 +205,24 @@ void insertarNodo()
 void agrega_arista(TNode& aux, TNode& aux2, TArista& nuevo)
 {
     TArista q;
-    if (aux->adyacente == NULL)
-    {
+    if (aux->adyacente == NULL){
         aux->adyacente = nuevo;
-        nuevo->derecha = aux2;
+        nuevo->destino = aux2;
         cout << "PRIMERA ARISTA....!";
-    }
-    else
-    {
+    } else {
         q = aux->adyacente;
-        while (q->siguiente != NULL)
-            q = q->siguiente;
-        nuevo->derecha = aux2;
-        q->siguiente = nuevo;
-        cout << "ARISTA AGREGADA...!!!!";
+        if(q->destino != aux2){
+            while (q->siguiente != NULL)
+                q = q->siguiente;
+            nuevo->destino = aux2;
+            q->siguiente = nuevo;
+            cout << "ARISTA AGREGADA...!!!!";
+        }
+        else
+            cout << "ARISTA EXISTENTE";
     }
-
 }
+
 /*                      INSERTAR ARISTA
     funcion que busca las posiciones de memoria de los nodos
     y hace llamado a agregar_arista para insertar la arista
@@ -206,6 +231,8 @@ void insertar_arista()
 {
     string ini, fin;
     TArista nuevo = new struct Arista;
+    TArista nuevo2 = new struct Arista;
+        
     TNode aux, aux2;
 
     if (p == NULL)
@@ -214,6 +241,9 @@ void insertar_arista()
         return;
     }
     nuevo->siguiente = NULL;
+    if(!dirigido)
+        nuevo2->siguiente = NULL;
+
     cout << "INGRESE NODO DE INICIO:";
     cin >> ini;
     cout << "INGRESE NODO FINAL:";
@@ -234,6 +264,9 @@ void insertar_arista()
         if (aux->nombre == ini)
         {
             agrega_arista(aux, aux2, nuevo);
+            if(!dirigido)
+                agrega_arista(aux2, aux, nuevo2);
+                
             return;
         }
 
@@ -343,7 +376,7 @@ void eliminar_arista()
             q = aux->adyacente;
             while (q != NULL)
             {
-                if (q->derecha == aux2)
+                if (q->destino == aux2)
                 {
                     if (q == aux->adyacente)
                         aux->adyacente = aux->adyacente->siguiente;
@@ -360,6 +393,7 @@ void eliminar_arista()
         aux = aux->siguiente;
     }
 }
+
 /*                      MOSTRAR GRAFO
     funcion que imprime un grafo en su forma enlazada
 ---------------------------------------------------------------------*/
@@ -378,7 +412,7 @@ void mostrar_grafo()
             ar = ptr->adyacente;
             while (ar != NULL)
             {
-                cout << " " << ar->derecha->nombre;
+                cout << " " << ar->destino->nombre;
                 ar = ar->siguiente;
             }
 
@@ -417,7 +451,7 @@ void mostrar_aristas()
 
                 while (ar != NULL)
                 {
-                    cout << ar->derecha->nombre << " ";
+                    cout << ar->destino->nombre << " ";
                     ar = ar->siguiente;
                 }
                 cout << endl;
@@ -433,7 +467,7 @@ void peso() {
     TNode aux;
     TArista ar;
     string var;
-    cout << "MOSTRAR ARISTAS DE NODO\n";
+    cout << "GRADO NODO\n";
     cout << "INGRESE NODO:";
     cin >> var;
     aux = p;
@@ -442,14 +476,14 @@ void peso() {
         if (aux->nombre == var)
         {
             if (aux->adyacente == NULL){
-                cout << "NODO|Peso\n";
+                cout << "NODO|Grado\n";
                 cout << "   " << aux->nombre << "|";
                 cout << "0";
                 return;
             }
             else
             {
-                cout << "NODO|Peso\n";
+                cout << "NODO|Grado\n";
                 cout << "   " << aux->nombre << "|";
                 ar = aux->adyacente;
                 int peso = 0;
@@ -459,6 +493,7 @@ void peso() {
                     ar = ar->siguiente;
                 }
                 cout << peso << endl;
+                //! Aquí esta el tercer commit
                 return ;
             }
         }
@@ -467,5 +502,67 @@ void peso() {
     }
 }
 
+void verificar_convexo(){
+    
+    bool convexo = true;
+    TNode ptr;
+    TArista ar;
+    ptr = p;
+
+    while (ptr != NULL)
+    {
+        if (ptr->adyacente != NULL)
+        {
+            ar = ptr->adyacente;
+            while (ar != NULL) {
+                list<string>::iterator it = nombres.begin();
+                while (*it != ar->destino->nombre && it != nombres.end() ) it++;
+                if(*it != ar->destino->nombre)
+                    convexo = false;
+
+                ar = ar->siguiente;
+            }
+
+        }
+        ptr = ptr->siguiente;
+    }
+
+    if(convexo)
+        cout << "Si lo es" << endl;
+    else
+        cout << "No lo es" << endl;
+}
+
+void abrir_archivo(){
+    string nombre_archivo;
+    string mensaje;
+
+    cout << "Ingresa el nombre/ruta del archivo: ";
+    cin >> nombre_archivo;
+
+    ifstream fe(nombre_archivo);
+    string space_delimiter = " ";
+    while (!fe.eof()) {
+        fe >> mensaje;
+
+        string nodoInicial(1,mensaje[0]);
+        insertar_nodo(nodoInicial);
+        mensaje.erase(0,4);
+
+        string lectura;
+        stringstream input_stringstream(mensaje);  
+        while (getline(input_stringstream, lectura, ' '))
+        {
+            cout << lectura << ",";
+        }
+
+        cout << endl;
+
+        // A | B D C S D A A
+    }
+    fe.close();
+
+    system("pause");
+}
 
 //! Hola este es el segundo commit
