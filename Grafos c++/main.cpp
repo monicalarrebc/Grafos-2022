@@ -1,3 +1,6 @@
+// les pido por favor agregar las referencias bibliográficas en caso de usasr códigos de base
+// es importante desarrollar esa costumbre. Podemos usar, pero siempre hay que referenciar.
+
 #include <iostream>
 #include <string.h>
 #include <algorithm>
